@@ -127,3 +127,9 @@
     @apply font-sans;
   }
 }
+
+/* Container centering */
+.container {
+  @apply mx-auto px-4 sm:px-6 lg:px-8;
+  max-width: 1280px;
+}
