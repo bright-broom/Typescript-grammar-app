@@ -1,0 +1,25 @@
+name: Send reminders
+
+# ユーザーごとのリマインダー時刻に近いタイミングで通知を送るため、15分おきに cron API を呼ぶ。
+# リポジトリの Secrets に APP_URL（例: https://example.vercel.app）と CRON_SECRET を設定すると有効になる。
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call reminder endpoint
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$APP_URL" ] || [ -z "$CRON_SECRET" ]; then
+            echo "APP_URL / CRON_SECRET が未設定のためスキップします"
+            exit 0
+          fi
+          curl --fail --silent --show-error -X POST \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "$APP_URL/api/cron/reminders"
