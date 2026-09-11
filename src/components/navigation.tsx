@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { signOutAction } from "@/app/actions/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -14,17 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
-import {
-  LayoutDashboard,
-  Calendar,
-  Dumbbell,
-  TrendingUp,
-  Trophy,
-  Menu,
-  X,
-  Settings,
-  LogOut,
-} from "lucide-react";
+import { LayoutDashboard, Calendar, Dumbbell, TrendingUp, Trophy, Menu, X, Settings, LogOut } from "lucide-react";
 
 interface NavigationProps {
   user?: {
@@ -64,6 +55,7 @@ export function Navigation({ user }: NavigationProps) {
               <Link
                 key={item.href}
                 href={item.href}
+                aria-current={isActive ? "page" : undefined}
                 className={cn(
                   "flex items-center gap-2 px-3 py-2 rounded-md transition-colors",
                   isActive
@@ -83,7 +75,10 @@ export function Navigation({ user }: NavigationProps) {
           <ThemeToggle />
           {user ? (
             <DropdownMenu>
-              <DropdownMenuTrigger className="relative h-8 w-8 rounded-full cursor-pointer ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+              <DropdownMenuTrigger
+                aria-label="アカウントメニュー"
+                className="relative h-8 w-8 rounded-full cursor-pointer ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={user.image || undefined} alt={user.name || ""} />
                   <AvatarFallback className="bg-gradient-to-br from-blue-500 to-cyan-500 text-white">
@@ -94,29 +89,23 @@ export function Navigation({ user }: NavigationProps) {
               <DropdownMenuContent className="w-56" align="end">
                 <div className="flex flex-col space-y-1 p-2">
                   <p className="text-sm font-medium leading-none">{user.name}</p>
-                  <p className="text-xs leading-none text-muted-foreground">
-                    {user.email}
-                  </p>
+                  <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
                 </div>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <Link href="/settings" className="w-full flex items-center gap-2">
-                    <Settings className="h-4 w-4" />
-                    設定
-                  </Link>
+                <DropdownMenuItem render={<Link href="/settings" />}>
+                  <Settings className="h-4 w-4" />
+                  設定
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <Link href="/api/auth/signout" className="w-full flex items-center gap-2 text-destructive">
-                    <LogOut className="h-4 w-4" />
-                    サインアウト
-                  </Link>
+                <DropdownMenuItem variant="destructive" onClick={() => signOutAction()}>
+                  <LogOut className="h-4 w-4" />
+                  サインアウト
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Link href="/auth/signin">
-              <Button size="sm">サインイン</Button>
+            <Link href="/auth/signin" className={buttonVariants({ size: "sm" })}>
+              サインイン
             </Link>
           )}
         </div>
@@ -127,13 +116,10 @@ export function Navigation({ user }: NavigationProps) {
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="p-2 rounded-md hover:bg-muted transition-colors"
-            aria-label="メニューを開く"
+            aria-label={mobileMenuOpen ? "メニューを閉じる" : "メニューを開く"}
+            aria-expanded={mobileMenuOpen}
           >
-            {mobileMenuOpen ? (
-              <X className="h-5 w-5" />
-            ) : (
-              <Menu className="h-5 w-5" />
-            )}
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>
@@ -185,22 +171,25 @@ export function Navigation({ user }: NavigationProps) {
                     <Settings className="h-5 w-5" />
                     設定
                   </Link>
-                  <Link
-                    href="/api/auth/signout"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-3 px-3 py-3 rounded-md text-destructive hover:bg-destructive/10 transition-colors"
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      void signOutAction();
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-3 rounded-md text-destructive hover:bg-destructive/10 transition-colors"
                   >
                     <LogOut className="h-5 w-5" />
                     サインアウト
-                  </Link>
+                  </button>
                 </>
               ) : (
                 <Link
                   href="/auth/signin"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block"
+                  className={buttonVariants({ className: "w-full" })}
                 >
-                  <Button className="w-full">サインイン</Button>
+                  サインイン
                 </Link>
               )}
             </div>

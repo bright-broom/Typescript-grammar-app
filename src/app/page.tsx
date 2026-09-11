@@ -1,15 +1,8 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Target,
-  RefreshCcw,
-  TrendingUp,
-  Zap,
-  ArrowRight,
-  Sparkles,
-} from "lucide-react";
+import { Target, RefreshCcw, TrendingUp, Zap, ArrowRight, Sparkles } from "lucide-react";
 
 const features = [
   {
@@ -43,9 +36,16 @@ const features = [
 ];
 
 const categories = [
-  "基本型", "配列・タプル", "オブジェクト型", "Union/Intersection",
-  "関数型", "ジェネリクス", "ユーティリティ型", "条件型",
-  "Mapped Types", "型パズル",
+  "基本型",
+  "配列・タプル",
+  "オブジェクト型",
+  "Union/Intersection",
+  "関数型",
+  "ジェネリクス",
+  "ユーティリティ型",
+  "条件型",
+  "Mapped Types",
+  "型パズル",
 ];
 
 export default function LandingPage() {
@@ -66,22 +66,23 @@ export default function LandingPage() {
             <p className="mt-6 text-lg leading-8 text-muted-foreground">
               アクエスメソッドを応用した、新しいTypeScript学習体験。
               <br />
-              日本語の説明からTypeScriptコードを即座に書く
-              「フラッシュトランスレーション」と
+              日本語の説明からTypeScriptコードを即座に書く 「フラッシュトランスレーション」と
               <br />
               忘却曲線に基づく「スパイラル学習」で、型システムを体に染み込ませよう。
             </p>
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/auth/signin">
-                <Button size="lg" className="px-8 gap-2 w-full sm:w-auto">
-                  学習を始める
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
+              <Link
+                href="/auth/signin"
+                className={buttonVariants({ size: "lg", className: "px-8 gap-2 w-full sm:w-auto" })}
+              >
+                学習を始める
+                <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
-              <Link href="/practice/free">
-                <Button variant="outline" size="lg" className="w-full sm:w-auto">
-                  お試しで解いてみる
-                </Button>
+              <Link
+                href="/practice/daily"
+                className={buttonVariants({ variant: "outline", size: "lg", className: "w-full sm:w-auto" })}
+              >
+                お試しで解いてみる
               </Link>
             </div>
           </div>
@@ -92,12 +93,9 @@ export default function LandingPage() {
       <section className="py-24 sm:py-32">
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              アクエスメソッド × TypeScript
-            </h2>
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">アクエスメソッド × TypeScript</h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              英会話スクールで実証された学習メソッドを
-              TypeScript文法学習に応用
+              英会話スクールで実証された学習メソッドを TypeScript文法学習に応用
             </p>
           </div>
           <div className="mx-auto mt-16 max-w-5xl">
@@ -113,9 +111,7 @@ export default function LandingPage() {
                       <CardTitle>{feature.title}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <CardDescription className="text-base">
-                        {feature.description}
-                      </CardDescription>
+                      <CardDescription className="text-base">{feature.description}</CardDescription>
                     </CardContent>
                   </Card>
                 );
@@ -129,16 +125,16 @@ export default function LandingPage() {
       <section className="py-24 sm:py-32 bg-muted/50">
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              10カテゴリの体系的カリキュラム
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              各カテゴリをLevel 1→2→3とスパイラル的に深掘り
-            </p>
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">10カテゴリの体系的カリキュラム</h2>
+            <p className="mt-4 text-lg text-muted-foreground">各カテゴリをLevel 1→2→3とスパイラル的に深掘り</p>
           </div>
           <div className="mx-auto mt-12 flex flex-wrap justify-center gap-3 max-w-3xl">
             {categories.map((category) => (
-              <Badge key={category} variant="outline" className="text-sm py-2 px-4 hover:bg-primary/10 transition-colors">
+              <Badge
+                key={category}
+                variant="outline"
+                className="text-sm py-2 px-4 hover:bg-primary/10 transition-colors"
+              >
                 {category}
               </Badge>
             ))}
@@ -150,19 +146,14 @@ export default function LandingPage() {
       <section className="py-24 sm:py-32">
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              今日から始めよう
-            </h2>
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">今日から始めよう</h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              毎日少しずつ、TypeScriptの型システムをマスターしていこう。
-              デイリーチャレンジで習慣化。
+              毎日少しずつ、TypeScriptの型システムをマスターしていこう。 デイリーチャレンジで習慣化。
             </p>
             <div className="mt-10">
-              <Link href="/auth/signin">
-                <Button size="lg" className="px-8 gap-2">
-                  無料で始める
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
+              <Link href="/auth/signin" className={buttonVariants({ size: "lg", className: "px-8 gap-2" })}>
+                無料で始める
+                <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
             </div>
           </div>
