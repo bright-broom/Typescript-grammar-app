@@ -1,31 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
-import { typeCheck } from "@/lib/typecheck";
 import { z } from "zod";
+import { typeCheck, MAX_CODE_LENGTH } from "@/lib/typecheck";
+import { checkTypecheckRateLimit, parseJson } from "@/lib/server/api";
+import { getCurrentUserId } from "@/lib/server/user";
 
 const requestSchema = z.object({
-  code: z.string(),
+  code: z.string().max(MAX_CODE_LENGTH),
 });
 
 export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const { code } = requestSchema.parse(body);
+  const userId = await getCurrentUserId();
+  const limited = checkTypecheckRateLimit(request, userId);
+  if (limited) return limited;
 
-    const result = typeCheck(code);
+  const parsed = await parseJson(request, requestSchema);
+  if ("response" in parsed) return parsed.response;
 
-    return NextResponse.json(result);
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: "Invalid request body", details: error.issues },
-        { status: 400 }
-      );
-    }
-
-    console.error("Type check error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json(typeCheck(parsed.data.code));
 }

@@ -36,3 +36,16 @@ export const XP_SPEED_BONUS = {
 } as const;
 
 export const STREAK_BONUS_MULTIPLIER = 0.1; // 10日連続で+10%
+
+/** 1日の目標問題数（= デイリーチャレンジ1セッションの問題数）の範囲 */
+export const DAILY_GOAL_MIN = 5;
+export const DAILY_GOAL_MAX = 30;
+
+export const FONT_SIZES = [
+  { id: "small", label: "小", rootPx: 14, editorPx: 13 },
+  { id: "medium", label: "中", rootPx: 16, editorPx: 14 },
+  { id: "large", label: "大", rootPx: 18, editorPx: 16 },
+  { id: "xlarge", label: "特大", rootPx: 20, editorPx: 18 },
+] as const;
+
+export type FontSizeId = (typeof FONT_SIZES)[number]["id"];

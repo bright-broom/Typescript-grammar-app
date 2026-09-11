@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export function ThemeToggle() {
-  const { setTheme, theme } = useTheme();
+  const { setTheme } = useTheme();
 
   return (
     <DropdownMenu>
@@ -47,19 +47,11 @@ export function ThemeButtons({ className }: ThemeButtonsProps) {
 
   return (
     <div className={className}>
-      <Button
-        variant={theme === "light" ? "default" : "outline"}
-        className="flex-1"
-        onClick={() => setTheme("light")}
-      >
+      <Button variant={theme === "light" ? "default" : "outline"} className="flex-1" onClick={() => setTheme("light")}>
         <Sun className="mr-2 h-4 w-4" />
         ライト
       </Button>
-      <Button
-        variant={theme === "dark" ? "default" : "outline"}
-        className="flex-1"
-        onClick={() => setTheme("dark")}
-      >
+      <Button variant={theme === "dark" ? "default" : "outline"} className="flex-1" onClick={() => setTheme("dark")}>
         <Moon className="mr-2 h-4 w-4" />
         ダーク
       </Button>

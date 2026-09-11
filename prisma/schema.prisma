@@ -51,12 +51,15 @@ model User {
   lastActiveAt  DateTime? @map("last_active_at")
   createdAt     DateTime  @default(now()) @map("created_at")
 
-  accounts  Account[]
-  sessions  Session[]
-  srsCards  SRSCard[]
-  responses Response[]
-  badges    UserBadge[]
-  settings  UserSettings?
+  accounts          Account[]
+  sessions          Session[]
+  srsCards          SRSCard[]
+  responses         Response[]
+  badges            UserBadge[]
+  settings          UserSettings?
+  bookmarks         Bookmark[]
+  dailySets         DailySet[]
+  pushSubscriptions PushSubscription[]
 
   @@map("users")
 }
@@ -89,7 +92,9 @@ model Problem {
   testCases TestCase[]
   srsCards  SRSCard[]
   responses Response[]
+  bookmarks Bookmark[]
 
+  @@index([category, level])
   @@map("problems")
 }
 
@@ -119,6 +124,7 @@ model SRSCard {
   problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
 
   @@unique([userId, problemId])
+  @@index([userId, nextReviewDate])
   @@map("srs_cards")
 }
 
@@ -130,11 +136,17 @@ model Response {
   timeSpent  Int      @map("time_spent")
   wasCorrect Boolean  @map("was_correct")
   userAnswer String   @map("user_answer") @db.Text
+  hintsUsed  Int      @default(0) @map("hints_used")
+  /// 模範解答を表示して諦めた記録
+  gaveUp     Boolean  @default(false) @map("gave_up")
+  xpEarned   Int      @default(0) @map("xp_earned")
   createdAt  DateTime @default(now()) @map("created_at")
 
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
 
+  @@index([userId, createdAt])
+  @@index([problemId])
   @@map("responses")
 }
 
@@ -146,18 +158,67 @@ model UserBadge {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, badgeId])
   @@map("user_badges")
 }
 
 model UserSettings {
-  id              String  @id @default(cuid())
-  userId          String  @unique @map("user_id")
-  dailyGoal       Int     @default(10) @map("daily_goal")
-  reminderTime    String? @map("reminder_time")
-  reminderEnabled Boolean @default(true) @map("reminder_enabled")
-  theme           String  @default("dark")
+  id                    String    @id @default(cuid())
+  userId                String    @unique @map("user_id")
+  dailyGoal             Int       @default(10) @map("daily_goal")
+  reminderTime          String?   @map("reminder_time")
+  reminderEnabled       Boolean   @default(true) @map("reminder_enabled")
+  theme                 String    @default("dark")
+  /// IANAタイムゾーン名。日付の区切り（今日・ストリーク・リマインダー）に使う
+  timezone              String    @default("Asia/Tokyo")
+  /// ランキングへの参加（任意参加のためデフォルトは不参加）
+  rankingOptIn          Boolean   @default(false) @map("ranking_opt_in")
+  lastReminderSentAt    DateTime? @map("last_reminder_sent_at")
+  lastStreakAlertSentAt DateTime? @map("last_streak_alert_sent_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_settings")
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  problemId String   @map("problem_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, problemId])
+  @@map("bookmarks")
+}
+
+/// その日のデイリーチャレンジの出題セット（1日の途中で出題が変わらないよう保存する）
+model DailySet {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  /// ユーザーのタイムゾーンでの日付 "YYYY-MM-DD"
+  date       String
+  problemIds String[] @map("problem_ids")
+  reviewIds  String[] @map("review_ids")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@map("daily_sets")
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  endpoint  String   @unique @db.Text
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("push_subscriptions")
 }

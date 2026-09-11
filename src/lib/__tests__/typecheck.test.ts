@@ -103,5 +103,47 @@ describe("TypeCheck", () => {
 
       expect(results[0].passed).toBe(false);
     });
+
+    it("should fail every test when user code itself has type errors", () => {
+      const userCode = `type Person = { name: string; age: number }; const broken: number = "x";`;
+      const results = runTestCases(userCode, [
+        { description: "エラー期待", code: `const p: Person = { name: 1, age: 1 }`, shouldPass: false },
+      ]);
+
+      expect(results[0].passed).toBe(false);
+      expect(results[0].error).toContain("回答コードに型エラー");
+    });
+
+    it("should require the error of a shouldPass:false case to occur in the test code", () => {
+      // テストコードが型エラーにならないので、ユーザーコードに依存せず不合格
+      const results = runTestCases(`type Loose = any;`, [
+        { description: "エラー期待", code: `const x: Loose = 1;`, shouldPass: false },
+      ]);
+
+      expect(results[0].passed).toBe(false);
+    });
+  });
+
+  describe("sandbox", () => {
+    it("should not read arbitrary files via triple-slash references", () => {
+      const result = typeCheck(`/// <reference path="/etc/passwd" />\nconst x = 1;`);
+      const messages = result.errors.map((e) => e.message).join("\n");
+
+      expect(messages).not.toContain("root:");
+    });
+
+    it("should not resolve imports from the file system", () => {
+      const result = typeCheck(`import fs from "fs";\nconst x = fs;`);
+
+      expect(result.success).toBe(false);
+    });
+
+    it("should still provide standard library types", () => {
+      const result = typeCheck(
+        `const xs = [1, 2, 3].map((x) => x * 2); const p: Promise<number> = Promise.resolve(xs[0]);`
+      );
+
+      expect(result.success).toBe(true);
+    });
   });
 });
