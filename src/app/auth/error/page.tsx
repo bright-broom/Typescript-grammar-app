@@ -25,9 +25,7 @@ function ErrorContent() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">認証エラー</CardTitle>
-          <CardDescription>
-            サインイン中に問題が発生しました
-          </CardDescription>
+          <CardDescription>サインイン中に問題が発生しました</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Alert variant="destructive">
@@ -36,9 +34,7 @@ function ErrorContent() {
           </Alert>
 
           <Link href="/auth/signin">
-            <Button className="w-full">
-              サインインページに戻る
-            </Button>
+            <Button className="w-full">サインインページに戻る</Button>
           </Link>
         </CardContent>
       </Card>
